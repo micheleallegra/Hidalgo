@@ -4,7 +4,7 @@ https://arxiv.org/abs/1902.10459
 
 
 COMPILE SOURCE
-mex -v CXX='$CXX -fopenmp' CXXOPTIMFLAGS='-O3 -DNDEBUG' hidalgo.cpp
+* mex -v CXX='$CXX -fopenmp' CXXOPTIMFLAGS='-O3 -DNDEBUG' hidalgo.cpp
 
 SYNTAX
 
@@ -18,6 +18,6 @@ SYNTAX
 * out=HeterogeneousID(X,'Nreplicas',R): apply Hidalgo to coordinate matrix X, repeating the clustering Nreplicas times and keeping the optimal result (by default N replicas=10)
 
 OUTPUT
-out.d: intrinsic dimensions of the clusters
-out.p: sizes of the cluster
-out.Z: probability of assignment of each point to the clusters (rows=clusters,cols=points)
+* out.d: intrinsic dimensions of the clusters
+* out.p: sizes of the cluster
+* out.Z: probability of assignment of each point to the clusters (rows=clusters,cols=points)
