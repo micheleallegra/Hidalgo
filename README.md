@@ -15,7 +15,7 @@ SYNTAX
 * out=HeterogeneousID(X,'q',Q): apply Hidalgo to coordinate matrix X, number of neighbors is set to q (by default q=3) 
 * out=HeterogeneousID(X,'Zeta',z): apply Hidalgo to coordinate matrix X, neighborhood uniformity is set to z (by default z=0.8)
 * out=HeterogeneousID(X,'Niter',N): apply Hidalgo to coordinate matrix X, numer of Gibbs iterations is set to N (by default N=10,000) 
-* out=HeterogeneousID(X,'Nreplicas',R): apply Hidalgo to coordinate matrix X, repeating the clustering Nreplicas times and keeping the optimal result (by default N replicas=10)
+* out=HeterogeneousID(X,'Nreplicas',R): apply Hidalgo to coordinate matrix X, repeating the clustering Nreplicas times and keeping the optimal result (by default Nreplicas=10)
 
 OUTPUT
 * out.d: intrinsic dimensions of the clusters
