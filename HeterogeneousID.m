@@ -3,7 +3,7 @@
 function out=AdvancedDensityPeaks(varargin)
 
 K=2;
-q=5;
+q=3;
 run_K=1;
 zeta = 0.8;
 Niter= 10000;
