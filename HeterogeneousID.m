@@ -4,10 +4,10 @@ function out=AdvancedDensityPeaks(varargin)
 
 K=2;
 q=3;
-run_K=1;
+run_K=0;
 zeta = 0.8;
 Niter= 10000;
-Nreplica = 10;
+Nreplica = 1;
 type = 1;
 
 if(nargin==0)
@@ -184,6 +184,7 @@ else
 	out.d = d(:,rmax);
 	out.p = p(:,rmax);
 	out.Z = Z(:,:,rmax);
+        out.L = L(2,rmax);
 end
 
 
