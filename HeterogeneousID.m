@@ -9,7 +9,7 @@ zeta = 0.8;
 Niter= 10000;
 Nreplica = 1;
 type = 1;
-ass_th=0.8
+ass_th=0.8;
 
 if(nargin==0)
   error('At least input data required.');
@@ -151,9 +151,9 @@ Lk=-1E10;
 if(run_K)
 	for K=1:8
 		if(type==1)
-			[d,p,P,L]=hidalgo(1,X',K,q,zeta,Niter,Nreplica);
+			[d,p,Pi,L]=hidalgo(1,X',K,q,zeta,Niter,Nreplica);
 		else
-			[d,p,P,L]=hidalgo(0,D,K,q,zeta,Niter,Nreplica);
+			[d,p,Pi,L]=hidalgo(0,D,K,q,zeta,Niter,Nreplica);
 		end
 
 		Pi = reshape(Pi,[N*K Nreplica]);
