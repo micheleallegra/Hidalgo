@@ -9,6 +9,7 @@ zeta = 0.8;
 Niter= 10000;
 Nreplica = 1;
 type = 1;
+ass_th=0.8
 
 if(nargin==0)
   error('At least input data required.');
@@ -150,20 +151,23 @@ Lk=-1E10;
 if(run_K)
 	for K=1:8
 		if(type==1)
-			[d,p,Z,L]=hidalgo(1,X',K,q,zeta,Niter,Nreplica);
-			L
+			[d,p,P,L]=hidalgo(1,X',K,q,zeta,Niter,Nreplica);
 		else
-			[d,p,Z,L]=hidalgo(0,D,K,q,zeta,Niter,Nreplica);
+			[d,p,P,L]=hidalgo(0,D,K,q,zeta,Niter,Nreplica);
 		end
 
-		Z = reshape(Z,[N*K Nreplica]);
-		Z = reshape(Z,[K N Nreplica]);
+		Pi = reshape(Pi,[N*K Nreplica]);
+		Pi = reshape(Pi,[K N Nreplica]);
 		[Lmax,rmax] = max(L(2,:));
 		if(Lmax>Lk)
 			Lk=Lmax;	
 			out.d = d(:,rmax);
 			out.p = p(:,rmax);
-			out.Z = Z(:,:,rmax);
+			out.Pi = Pi(:,:,rmax);
+			[Pimax, Z] = max(Pi);
+			unassigned = find(Pimax<ass_th);
+			Z(unassigned)=0;
+			out.Z = Z;
 		else
 			break;
 		end
@@ -171,19 +175,23 @@ if(run_K)
 	
 else
 	if(type==1)
-		[d,p,Z,L]=hidalgo(1,X',K,q,zeta,Niter,Nreplica);
+		[d,p,Pi,L]=hidalgo(1,X',K,q,zeta,Niter,Nreplica);
 	else
-		[d,p,Z,L]=hidalgo(0,D,K,q,zeta,Niter,Nreplica);
+		[d,p,Pi,L]=hidalgo(0,D,K,q,zeta,Niter,Nreplica);
 	end
 
-	Z = reshape(Z,[N*K Nreplica]);
-	Z = reshape(Z,[K N Nreplica]);
+	Pi = reshape(Pi,[N*K Nreplica]);
+	Pi = reshape(Pi,[K N Nreplica]);
 
 	[Lmax,rmax] = max(L(2,:));
 
 	out.d = d(:,rmax);
 	out.p = p(:,rmax);
-	out.Z = Z(:,:,rmax);
+	out.Pi = Pi(:,:,rmax);
+        [Pimax, Z] = max(Pi);
+        unassigned = find(Pimax<ass_th);
+        Z(unassigned)=0;
+	out.Z = Z;
         out.L = L(2,rmax);
 end
 
