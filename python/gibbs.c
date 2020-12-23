@@ -24,9 +24,17 @@ static PyMethodDef _gibbsMethods[] = {
 
 /* ==== Initialize the C_test functions ====================== */
 // Module name must be _C_arraytest in compile and linked 
-void init_gibbs()  {
-	(void) Py_InitModule("_gibbs", _gibbsMethods);
-	import_array();  // Must be present for NumPy.  Called first after above line.
+static struct PyModuleDef cModPyDem =
+{
+    PyModuleDef_HEAD_INIT,
+    "_gibbs", "Some documentation",
+    -1,
+    _gibbsMethods
+};
+
+PyMODINIT_FUNC PyInit__gibbs(void)
+{
+    return PyModule_Create(&cModPyDem);
 }
 
 

@@ -1,16 +1,11 @@
 import numpy as np
-import random
 from sklearn.neighbors import NearestNeighbors
-import matplotlib.pyplot as plt
-import sys
-#sys.path.append("./lib/python")
 import _gibbs
-
 
 
 class  hidalgo():
 
-	def __init__(self, metric = 'euclidean', K = 2, zeta=0.8, q=3, Niter=10000, Nreplicas=1,burn_in=0.9,a=np.ones(2),b=np.ones(2),c=np.ones(2),f=np.ones(2)):
+	def __init__(self, metric = 'euclidean', K = 2, zeta=0.8, q=3, Niter=10000, Nreplicas=1,burn_in=0.9,a=None,b=None,c=None,f=None):
 
 		a=np.ones(K)
 		a=np.ones(K)
@@ -24,10 +19,15 @@ class  hidalgo():
 		self.Niter=Niter
 		self.burn_in=burn_in
 		self.Nreplicas=Nreplicas
-		self.a=a
-		self.b=b
-		self.c=c
-		self.f=f
+		self.a = self._init_priors(K, a)
+		self.b = self._init_priors(K, b)
+		self.c = self._init_priors(K, c)
+		self.f = self._init_priors(K, f)
+
+	def _init_priors(self, K, values=None):
+		if values is not None:
+			return np.array(None)
+		return np.ones(K)
 
 	def _fit(self,X):
 
@@ -85,7 +85,7 @@ class  hidalgo():
 		self.Nsamp=Nsamp
 		Npar=N+2*K+2+1*(estimate_zeta);
 
-		print Nsamp,Npar
+		print(Nsamp,Npar)
 		sampling=2*np.ones(Nsamp*Npar);
 		bestsampling=np.zeros((Nsamp,Npar));
 
