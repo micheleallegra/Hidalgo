@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
-from dimension import _gibbs
+import _gibbs
 
 
 class hidalgo:
