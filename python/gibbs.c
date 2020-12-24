@@ -217,7 +217,6 @@ static PyObject *GibbsSampling(PyObject *self, PyObject *args)
 
 	int it;
 	int step = get_step(Niter);
-	printf("Step %d\n", step);
 	int prev = 0;
 	int prev1 = 0;
 
