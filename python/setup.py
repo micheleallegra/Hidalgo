@@ -4,7 +4,7 @@ from distutils.core import Extension
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-module1 = Extension("_gibbs", sources=["gibbs.c"], runtime_library_dirs=["dimension/"])
+module1 = Extension("dimension.hidalgo._gibbs", sources=["./dimension/gibbs.c"])
 
 setuptools.setup(
     name="dimension",
