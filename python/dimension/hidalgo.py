@@ -35,11 +35,16 @@ class hidalgo:
         self.b = self._init_priors(K, b)
         self.c = self._init_priors(K, c)
         self.f = self._init_priors(K, f)
+        self._nbrs = None
+        self._fitted = False
 
     def _init_priors(self, K, values=None):
         if values is not None:
             return np.array(None)
         return np.ones(K)
+
+    def __repr__(self):
+        return f"Hidalgo(K={self.K}, Niter={self.Niter}, Nreplicas={self.Nreplicas})"
 
     def _fit(self, X):
 
@@ -60,10 +65,10 @@ class hidalgo:
         N, d = np.shape(X)
 
         if self.metric != "predefined":
-            nbrs = NearestNeighbors(
+            self._nbrs = NearestNeighbors(
                 n_neighbors=q + 1, algorithm="ball_tree", metric=self.metric
             ).fit(X)
-            distances, indicesIn = nbrs.kneighbors(X)
+            distances, indicesIn = self._nbrs.kneighbors(X)
 
             nbrmat = np.zeros((N, N))
 
@@ -99,7 +104,6 @@ class hidalgo:
         self.Nsamp = Nsamp
         Npar = N + 2 * K + 2 + 1 * (estimate_zeta)
 
-        print(Nsamp, Npar)
         sampling = 2 * np.ones(Nsamp * Npar)
         bestsampling = np.zeros((Nsamp, Npar))
 
@@ -107,6 +111,8 @@ class hidalgo:
         indicesIn = np.reshape(indicesIn, (N * q,))
 
         maxlik = -1.0e10
+
+        print(f"Start sampling {self}")
 
         for r in range(Nreplicas):
             _gibbs.GibbsSampling(
@@ -162,6 +168,19 @@ class hidalgo:
         Z = Z + 1
         Z[np.where(pZ < 0.8)] = 0
         self.Z = Z
+        self._fitted = True
+
+    def predict(self, X):
+        if not self._fitted:
+            raise RuntimeError("Need to fit estimator first.")
+        else:
+            if self._nbrs is not None:
+                _, indices = self._nbrs.kneighbors(X)
+                return self.Z[indices[:, 1]]
+            else:
+                raise RuntimeError(
+                    f"NearestNeighbors is not fitted for metric={self.metric}."
+                )
 
 
 """
