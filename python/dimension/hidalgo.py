@@ -176,7 +176,7 @@ class hidalgo:
         else:
             if self._nbrs is not None:
                 _, indices = self._nbrs.kneighbors(X)
-                return self.Z[indices[:, 1]]
+                return self.Z[indices[:, 0]]
             else:
                 raise RuntimeError(
                     f"NearestNeighbors is not fitted for metric={self.metric}."
