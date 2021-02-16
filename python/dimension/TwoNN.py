@@ -55,12 +55,12 @@ class  TwoNN():
 			BlockDimMeanEstimate = np.zeros(maxnblocks)
 			BlockDimStdEstimate = np.zeros(maxnblocks)
 
-			idx = range(N)
+			idx = list(range(N))
 			random.shuffle(idx)
 
 			for nblocks in range(1,maxnblocks+1):
 				BlockDimEst=[]
-				blocksize=N/nblocks
+				blocksize = int(N / nblocks)
 
 				for b in range(nblocks):
 					Y=X[idx[b*blocksize:(b+1)*blocksize],:]

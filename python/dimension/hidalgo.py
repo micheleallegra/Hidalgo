@@ -1,141 +1,189 @@
 import numpy as np
-import random
 from sklearn.neighbors import NearestNeighbors
-import matplotlib.pyplot as plt
-import sys
-#sys.path.append("./lib/python")
-import _gibbs
+from . import _gibbs
 
 
+class hidalgo:
+    def __init__(
+        self,
+        metric="euclidean",
+        K=2,
+        zeta=0.8,
+        q=3,
+        Niter=10000,
+        Nreplicas=1,
+        burn_in=0.9,
+        a=None,
+        b=None,
+        c=None,
+        f=None,
+    ):
 
-class  hidalgo():
+        a = np.ones(K)
+        a = np.ones(K)
+        a = np.ones(K)
+        a = np.ones(K)
 
-	def __init__(self, metric = 'euclidean', K = 2, zeta=0.8, q=3, Niter=10000, Nreplicas=1,burn_in=0.9,a=np.ones(2),b=np.ones(2),c=np.ones(2),f=np.ones(2)):
+        self.metric = metric
+        self.K = K
+        self.zeta = zeta
+        self.q = q
+        self.Niter = Niter
+        self.burn_in = burn_in
+        self.Nreplicas = Nreplicas
+        self.a = self._init_priors(K, a)
+        self.b = self._init_priors(K, b)
+        self.c = self._init_priors(K, c)
+        self.f = self._init_priors(K, f)
+        self._nbrs = None
+        self._fitted = False
 
-		a=np.ones(K)
-		a=np.ones(K)
-		a=np.ones(K)
-		a=np.ones(K)
+    def _init_priors(self, K, values=None):
+        if values is not None:
+            return np.array(None)
+        return np.ones(K)
 
-		self.metric = metric
-		self.K = K
-		self.zeta = zeta
-		self.q = q
-		self.Niter=Niter
-		self.burn_in=burn_in
-		self.Nreplicas=Nreplicas
-		self.a=a
-		self.b=b
-		self.c=c
-		self.f=f
+    def __repr__(self):
+        return f"Hidalgo(K={self.K}, Niter={self.Niter}, Nreplicas={self.Nreplicas})"
 
-	def _fit(self,X):
+    def _fit(self, X):
 
-		q=self.q
-		K=self.K
-		Niter=self.Niter
-		zeta=self.zeta
-		Nreplicas=self.Nreplicas
-		a=self.a
-		b=self.b
-		c=self.c
-		f=self.f
-		burn_in=self.burn_in
+        q = self.q
+        K = self.K
+        Niter = self.Niter
+        zeta = self.zeta
+        Nreplicas = self.Nreplicas
+        a = self.a
+        b = self.b
+        c = self.c
+        f = self.f
+        burn_in = self.burn_in
 
-		assert isinstance(X,np.ndarray), "X should be a numpy array"
-		assert len(np.shape(X))==2, "X should be a two-dimensional numpy array"
+        assert isinstance(X, np.ndarray), "X should be a numpy array"
+        assert len(np.shape(X)) == 2, "X should be a two-dimensional numpy array"
 
-		N,d = np.shape(X)
+        N, d = np.shape(X)
 
-		if self.metric!='predefined':
-			nbrs = NearestNeighbors(n_neighbors=q+1, algorithm='ball_tree',metric=self.metric).fit(X)
-			distances, indicesIn = nbrs.kneighbors(X)
+        if self.metric != "predefined":
+            self._nbrs = NearestNeighbors(
+                n_neighbors=q + 1, algorithm="ball_tree", metric=self.metric
+            ).fit(X)
+            distances, indicesIn = self._nbrs.kneighbors(X)
 
-			nbrmat=np.zeros((N,N))
+            nbrmat = np.zeros((N, N))
 
-			for n in range(q):
-				nbrmat[indicesIn[:,0],indicesIn[:,n+1]]=1
+            for n in range(q):
+                nbrmat[indicesIn[:, 0], indicesIn[:, n + 1]] = 1
 
-			nbrcount=np.sum(nbrmat,axis=0)
-			indicesOut=np.where(nbrmat.T)[1]
-			indicesTrack=np.cumsum(nbrcount)
-			indicesTrack=np.append(0,indicesTrack[:-1])
-			
-		else:
-			distances = np.sort(X)[:,:q+1]
-			indicesIn = np.argsort(X)[:,:q+1]
+            nbrcount = np.sum(nbrmat, axis=0)
+            indicesOut = np.where(nbrmat.T)[1]
+            indicesTrack = np.cumsum(nbrcount)
+            indicesTrack = np.append(0, indicesTrack[:-1])
 
-			nbrmat=np.zeros((N,N))
+        else:
+            distances = np.sort(X)[:, : q + 1]
+            indicesIn = np.argsort(X)[:, : q + 1]
 
-			for n in range(q):
-				nbrmat[indicesIn[:,0],indicesIn[:,n+1]]=1
+            nbrmat = np.zeros((N, N))
 
-			nbrcount=np.sum(nbrmat,axis=0)
-			indicesOut=np.where(nbrmat.T)[1]
-			indicesTrack=np.cumsum(nbrcount)
-			indicesTrack=np.append(0,indicesTrack[:-1])
+            for n in range(q):
+                nbrmat[indicesIn[:, 0], indicesIn[:, n + 1]] = 1
 
-		mu = np.divide(distances[:,2],distances[:,1])
+            nbrcount = np.sum(nbrmat, axis=0)
+            indicesOut = np.where(nbrmat.T)[1]
+            indicesTrack = np.cumsum(nbrcount)
+            indicesTrack = np.append(0, indicesTrack[:-1])
 
-		fixed_Z=0;
-		use_Potts=1;
-		estimate_zeta=0;
-		sampling_rate=10;
-		Nsamp=np.floor((Niter-np.ceil(burn_in*Niter))/sampling_rate).astype(int)
-		self.Nsamp=Nsamp
-		Npar=N+2*K+2+1*(estimate_zeta);
+        mu = np.divide(distances[:, 2], distances[:, 1])
 
-		print Nsamp,Npar
-		sampling=2*np.ones(Nsamp*Npar);
-		bestsampling=np.zeros((Nsamp,Npar));
+        fixed_Z = 0
+        use_Potts = 1
+        estimate_zeta = 0
+        sampling_rate = 10
+        Nsamp = np.floor((Niter - np.ceil(burn_in * Niter)) / sampling_rate).astype(int)
+        self.Nsamp = Nsamp
+        Npar = N + 2 * K + 2 + 1 * (estimate_zeta)
 
-		indicesIn=indicesIn[:,1:]
-		indicesIn=np.reshape(indicesIn,(N*q,))
+        sampling = 2 * np.ones(Nsamp * Npar)
+        bestsampling = np.zeros((Nsamp, Npar))
 
-		maxlik=-1.E10
+        indicesIn = indicesIn[:, 1:]
+        indicesIn = np.reshape(indicesIn, (N * q,))
 
-		for r in range(Nreplicas):
-			_gibbs.GibbsSampling(Niter,K,fixed_Z,use_Potts,estimate_zeta,q,zeta,sampling_rate,burn_in,r,mu,indicesIn.astype(float),indicesOut.astype(float),nbrcount,indicesTrack,a,b,c,f,sampling)
-			sampling=np.reshape(sampling,(Nsamp,Npar))	
-			lik=np.mean(sampling[:,-1],axis=0)
-			if(lik>maxlik): 
-				bestsampling=sampling
-			sampling=np.reshape(sampling,(Nsamp*Npar,))	
+        maxlik = -1.0e10
 
-		return bestsampling
+        print(f"Start sampling {self}")
+
+        for r in range(Nreplicas):
+            _gibbs.GibbsSampling(
+                Niter,
+                K,
+                fixed_Z,
+                use_Potts,
+                estimate_zeta,
+                q,
+                zeta,
+                sampling_rate,
+                burn_in,
+                r,
+                mu,
+                indicesIn.astype(float),
+                indicesOut.astype(float),
+                nbrcount,
+                indicesTrack,
+                a,
+                b,
+                c,
+                f,
+                sampling,
+            )
+            sampling = np.reshape(sampling, (Nsamp, Npar))
+            lik = np.mean(sampling[:, -1], axis=0)
+            if lik > maxlik:
+                bestsampling = sampling
+            sampling = np.reshape(sampling, (Nsamp * Npar,))
+
+        return bestsampling
+
+    def fit(self, X):
+        N = np.shape(X)[0]
+        sampling = self._fit(X)
+        K = self.K
+
+        self.d_ = np.mean(sampling[:, :K], axis=0)
+        self.derr_ = np.std(sampling[:, :K], axis=0)
+        self.p_ = np.mean(sampling[:, K : 2 * K], axis=0)
+        self.perr_ = np.std(sampling[:, K : 2 * K], axis=0)
+        self.lik_ = np.mean(sampling[:, -1], axis=0)
+        self.likerr_ = np.std(sampling[:, -1], axis=0)
+
+        Pi = np.zeros((K, N))
+
+        for k in range(K):
+            Pi[k, :] = np.sum(sampling[:, 2 * K : 2 * K + N] == k, axis=0)
+
+        self.Pi = Pi / self.Nsamp
+        Z = np.argmax(Pi, axis=0)
+        pZ = np.max(Pi, axis=0)
+        Z = Z + 1
+        Z[np.where(pZ < 0.8)] = 0
+        self.Z = Z
+        self._fitted = True
+
+    def predict(self, X):
+        if not self._fitted:
+            raise RuntimeError("Need to fit estimator first.")
+        else:
+            if self._nbrs is not None:
+                _, indices = self._nbrs.kneighbors(X)
+                return self.Z[indices[:, 0]]
+            else:
+                raise RuntimeError(
+                    f"NearestNeighbors is not fitted for metric={self.metric}."
+                )
 
 
-
-	def fit(self, X):
-		N=np.shape(X)[0]
-		sampling=self._fit(X)
-		K=self.K
-
-		self.d_=np.mean(sampling[:,:K],axis=0)
-		self.derr_=np.std(sampling[:,:K],axis=0)
-		self.p_=np.mean(sampling[:,K:2*K],axis=0)
-		self.perr_=np.std(sampling[:,K:2*K],axis=0)
-		self.lik_=np.mean(sampling[:,-1],axis=0)
-		self.likerr_=np.std(sampling[:,-1],axis=0)
-		
-		Pi=np.zeros((K,N))
-
-		for k in range(K):
-			Pi[k,:]=np.sum(sampling[:,2*K:2*K+N]==k,axis=0)
-
-		self.Pi=Pi/self.Nsamp
-		Z=np.argmax(Pi,axis=0);
-		pZ=np.max(Pi,axis=0);
-		Z=Z+1
-		Z[np.where(pZ<0.8)]=0
-		self.Z=Z
-
-		
-
-
-
-
-'''
+"""
 		if self.method=='MaxLikelihood':
 			DimEstimate = float(N)/np.sum(np.log(mu))
 		else:
@@ -210,5 +258,5 @@ class  hidalgo():
 
 			plt.show()		
 
-'''
+"""
 
