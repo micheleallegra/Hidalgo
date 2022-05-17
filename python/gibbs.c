@@ -22,11 +22,21 @@ static PyMethodDef _gibbsMethods[] = {
 	{NULL, NULL}     /* Sentinel - marks the end of this structure */
 };
 
-/* ==== Initialize the C_test functions ====================== */
-// Module name must be _C_arraytest in compile and linked 
-void init_gibbs()  {
-	(void) Py_InitModule("_gibbs", _gibbsMethods);
-	import_array();  // Must be present for NumPy.  Called first after above line.
+ static struct PyModuleDef _gibbs =
+{
+
+   PyModuleDef_HEAD_INIT,
+   "cModPyDem", /* name of module */
+    "",          /* module documentation, may be NULL */
+    -1,          /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+   _gibbsMethods
+};
+
+
+PyMODINIT_FUNC PyInit__gibbs(void)
+{
+    import_array();  // Must be present for NumPy.  Called first after above line.
+    return PyModule_Create(&_gibbs);
 }
 
 
