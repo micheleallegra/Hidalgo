@@ -1,4 +1,4 @@
-nppath=`python3 -c 'import numpy; print numpy.__path__[0]'`
+nppath=`python3 -c 'import numpy; print(numpy.__path__[0])'`
 nppath=$nppath/core/include/numpy
 mkdir lib
 mkdir lib/python
