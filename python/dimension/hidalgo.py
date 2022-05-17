@@ -85,7 +85,6 @@ class  hidalgo():
 		self.Nsamp=Nsamp
 		Npar=N+2*K+2+1*(estimate_zeta);
 
-		print Nsamp,Npar
 		sampling=2*np.ones(Nsamp*Npar);
 		bestsampling=np.zeros((Nsamp,Npar));
 
