@@ -55,7 +55,7 @@ class  TwoNN():
 			BlockDimMeanEstimate = np.zeros(maxnblocks)
 			BlockDimStdEstimate = np.zeros(maxnblocks)
 
-			idx = range(N)
+			idx = list(range(N))
 			random.shuffle(idx)
 
 			for nblocks in range(1,maxnblocks+1):
@@ -63,7 +63,7 @@ class  TwoNN():
 				blocksize=N/nblocks
 
 				for b in range(nblocks):
-					Y=X[idx[b*blocksize:(b+1)*blocksize],:]
+					Y=X[idx[int(b*blocksize):int((b+1)*blocksize)],:]
 					bde,mu=self._fit(Y) 					
 					BlockDimEst=np.append(BlockDimEst,bde)
 
@@ -101,5 +101,4 @@ class  TwoNN():
 			plt.errorbar(BlockEstimates[:,0],BlockEstimates[:,1],BlockEstimates[:,2],color="red")
 
 			plt.show()		
-
 
