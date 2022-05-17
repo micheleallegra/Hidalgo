@@ -4,6 +4,6 @@ mkdir lib
 mkdir lib/python
 export PYTHONPATH=$PYTHONPATH:./lib/python/
 CFLAGS="-I $nppath" python setup.py install --home=./ 
-python setup.py build
+python3 setup.py build
 gs=`find build/ -name _gibbs.so`
 cp $gs dimension/
