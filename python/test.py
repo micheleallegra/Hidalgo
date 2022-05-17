@@ -18,7 +18,6 @@ for j in range(d2):
 
 
 K=2;
-
 ########## run TwoNN ###################################################################
 
 model = TwoNN()
@@ -27,12 +26,11 @@ m = TwoNN(metric = 'euclidean', method = 'LinearFit',discard=0.1,block_analysis=
 
 model.fit(X[:N,:])
 
-print model.DimEstimate_
+print(model.DimEstimate_)
 
 model.ShowLinearFit()
 
 model.ShowBlockAnalysis()
-
 
 ############## run Hidalgo ##################################################################
 
@@ -44,11 +42,11 @@ model=hidalgo(K=K)
 
 model.fit(X)
 
-print model.d_,model.derr_
-print model.p_,model.perr_
-print model.lik_, model.likerr_
-print model.Pi
-print model.Z
+print(model.d_,model.derr_)
+print(model.p_,model.perr_)
+print(model.lik_, model.likerr_)
+print(model.Pi)
+print(model.Z)
 
 
 D = euclidean_distances(X)
@@ -57,9 +55,8 @@ model=hidalgo(metric = 'predefined',K=K)
 
 model.fit(D)
 
-print model.d_,model.derr_
-print model.p_,model.perr_
-print model.lik_, model.likerr_
-print model.Pi
-print model.Z
-
+print(model.d_,model.derr_)
+print(model.p_,model.perr_)
+print(model.lik_, model.likerr_)
+print(model.Pi)
+print(model.Z)
