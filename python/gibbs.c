@@ -9,7 +9,7 @@
 //#include <numeric>
 //#include <assert.h>
 #include <Python.h>
-#include "arrayobject.h"
+#include "numpy/arrayobject.h"
 #include "gibbs.h"
 
 

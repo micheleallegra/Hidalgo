@@ -1,2 +1,2 @@
-from hidalgo import hidalgo
-from TwoNN import TwoNN
+from .hidalgo import hidalgo
+from .TwoNN import TwoNN
