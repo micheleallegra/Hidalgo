@@ -9,7 +9,7 @@
 //#include <numeric>
 //#include <assert.h>
 #include <Python.h>
-#include "arrayobject.h"
+#include "numpy/arrayobject.h"
 #include "gibbs.h"
 
 
@@ -218,7 +218,7 @@ static PyObject *GibbsSampling(PyObject *self, PyObject *args) {
 		int k=Z[i];
 		for(j=0; j<q;j++) {
 			int index=(int)Iin[q*i+j];
-			if(Z[index]==k) N_in=N_in++;
+			if(Z[index]==k) N_in++;
 	    }			
 	}	
 
