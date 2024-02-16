@@ -1,13 +1,13 @@
 import setuptools
 from distutils.core import Extension
-# import numpy as np
+import numpy
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 module1 = Extension('_gibbs',
                     sources = ['gibbs.c'],
-                    include_dirs = ["."])
+                    include_dirs = [numpy.get_include(),"."])
 
 setuptools.setup(
     name="dimension",
